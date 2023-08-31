@@ -9,7 +9,7 @@
         "webRequest"
     ],
     "host_permissions": [
-        "*://*.neal.fun/*"
+       "https://*.neal.fun/*"
     ],
     "action": {
         "default_popup": "popup.html",
@@ -22,7 +22,7 @@
     "content_scripts": [
         {
             "matches": [
-                "*://*.neal.fun/*"
+                "https://*.neal.fun/*"
             ],
             "js": [
                 "content.js"

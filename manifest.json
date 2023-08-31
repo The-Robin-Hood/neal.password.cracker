@@ -1,0 +1,32 @@
+{
+    "manifest_version": 3,
+    "name": "Data Sender Extension",
+    "version": "1.0",
+    "description": "Extension that sends data from service worker to main content",
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "webRequest"
+    ],
+    "host_permissions": [
+        "*://*.neal.fun/*"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "Data Sender Extension"
+    },
+    "background": {
+        "service_worker": "service-worker.js",
+        "type": "module"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*.neal.fun/*"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ]
+}

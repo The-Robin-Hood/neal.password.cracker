@@ -9,14 +9,14 @@
         "webRequest"
     ],
     "host_permissions": [
-       "https://*.neal.fun/*"
+        "https://*.neal.fun/*"
     ],
     "action": {
-        "default_popup": "popup.html",
+        "default_popup": "src/popup/index.html",
         "default_title": "Neal Password Cracker"
     },
     "background": {
-        "service_worker": "service-worker.js",
+        "service_worker": "src/background/index.js",
         "type": "module"
     },
     "content_scripts": [
@@ -25,7 +25,7 @@
                 "https://*.neal.fun/*"
             ],
             "js": [
-                "content.js"
+                "src/content/index.js"
             ]
         }
     ]

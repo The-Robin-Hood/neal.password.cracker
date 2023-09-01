@@ -1,0 +1,22 @@
+{
+  "name": "neal-password-cracker",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build -w",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.244",
+    "@types/luxon": "^3.3.2",
+    "@types/suncalc": "^1.9.0",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5"
+  },
+  "dependencies": {
+    "luxon": "^3.4.2",
+    "suncalc": "^1.9.0"
+  }
+}

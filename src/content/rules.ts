@@ -1,155 +1,181 @@
-import { containsRomanNumeral } from "./helper";
-const PERIODIC_TABLE = [
-    "H",
-    "He",
-    "Li",
-    "Be",
-    "B",
-    "C",
-    "N",
-    "O",
-    "F",
-    "Ne",
-    "Na",
-    "Mg",
-    "Al",
-    "Si",
-    "P",
-    "S",
-    "Cl",
-    "Ar",
-    "K",
-    "Ca",
-    "Sc",
-    "Ti",
-    "V",
-    "Cr",
-    "Mn",
-    "Fe",
-    "Co",
-    "Ni",
-    "Cu",
-    "Zn",
-    "Ga",
-    "Ge",
-    "As",
-    "Se",
-    "Br",
-    "Kr",
-    "Rb",
-    "Sr",
-    "Y",
-    "Zr",
-    "Nb",
-    "Mo",
-    "Tc",
-    "Ru",
-    "Rh",
-    "Pd",
-    "Ag",
-    "Cd",
-    "In",
-    "Sn",
-    "Sb",
-    "Te",
-    "I",
-    "Xe",
-    "Cs",
-    "Ba",
-    "La",
-    "Ce",
-    "Pr",
-    "Nd",
-    "Pm",
-    "Sm",
-    "Eu",
-    "Gd",
-    "Tb",
-    "Dy",
-    "Ho",
-    "Er",
-    "Tm",
-    "Yb",
-    "Lu",
-    "Hf",
-    "Ta",
-    "W",
-    "Re",
-    "Os",
-    "Ir",
-    "Pt",
-    "Au",
-    "Hg",
-    "Tl",
-    "Pb",
-    "Bi",
-    "Po",
-    "At",
-    "Rn",
-    "Fr",
-    "Ra",
-    "Ac",
-    "Th",
-    "Pa",
-    "U",
-    "Np",
-    "Pu",
-    "Am",
-    "Cm",
-    "Bk",
-    "Cf",
-    "Es",
-    "Fm",
-    "Md",
-    "No",
-    "Lr",
-    "Rf",
-    "Db",
-    "Sg",
-    "Bh",
-    "Hs",
-    "Mt",
-    "Ds",
-    "Rg",
-    "Cn",
-    "Nh",
-    "Fl",
-    "Mc",
-    "Lv",
-    "Ts",
-    "Og",
-]
+import { periodicTable } from "./constants"
+import { getCaptcha, getCurrentTime, getHexCode, getSacrificialLetters } from "./helper"
+import {
+	appendPassword,
+	contains,
+	containsPeriodicSymbol,
+	containsRomanNumeral,
+	getPassword,
+	getPasswordText,
+	replacePassword,
+	sleep,
+	subtractAndSplit,
+} from "./utils"
 
-const rule11 = async () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
-    const response = await fetch(
-        "https://neal.fun/api/password-game/wordle?date=" + formattedDate
-    );
-    const data = await response.json();
-    let wordle = data.answer;
-    let isCapitalized = false;
-    let atomicValueList = [];
+let previouslyAddedPeriodicSymbols: string[] = ["He"]
+let lettersNotToBe: string[] = []
 
-    for (let letter of wordle) {
-        if (!PERIODIC_TABLE.includes(letter.toUpperCase()) && !isCapitalized && !containsRomanNumeral(letter.toUpperCase())) {
-            wordle = wordle.replace(letter, letter.toUpperCase());
-            isCapitalized = true;
-            break;
-        } else {
-            atomicValueList.push(PERIODIC_TABLE.indexOf(letter.toUpperCase()));
-        }
-    }
-    
-    if (!isCapitalized) {
-        const min = Math.min(...atomicValueList);
-        const index = atomicValueList.indexOf(min);
-        wordle = wordle.replace(wordle[index], wordle[index].toUpperCase());
-    }
-    return wordle;
+function rule5() {
+	const exisitingPasswd = getPasswordText() as string
+	const numbers = exisitingPasswd.match(/\d/g)!.map(Number)
+	const currentSum = numbers.reduce((acc, num) => acc + num, 0)
+
+	if (currentSum === 25) {
+		return
+	} else if (currentSum < 25) {
+		let balance = 25 - currentSum
+		const numbersToAdd = []
+		for (let i = 9; i >= 1; i--) {
+			while (balance >= i) {
+				numbersToAdd.push(i)
+				balance -= i
+			}
+		}
+		appendPassword(getPassword(), numbersToAdd.join(""))
+	} else {
+		let extras = currentSum - 25
+		const allNumbers = exisitingPasswd.split("-----")[1]
+		const numbersToBe = subtractAndSplit(allNumbers.split(""), extras).join("")
+		replacePassword(allNumbers, numbersToBe)
+	}
 }
 
-export { rule11 }
+async function rule10() {
+	let captcha = getCaptcha()
+
+	console.log(
+		containsRomanNumeral(captcha) , /[0-9]/.test(captcha) , containsPeriodicSymbol(captcha)
+	)
+	while (
+		containsRomanNumeral(captcha) ||
+		/[0-9]/.test(captcha) ||
+		containsPeriodicSymbol(captcha)
+	) {
+		const captchaRefresh = document.querySelector(".captcha-refresh") as HTMLButtonElement
+		captchaRefresh.click()
+		await sleep(10)
+		captcha = getCaptcha()
+	}
+	appendPassword(getPassword(), captcha)
+}
+
+function rule18() {
+	console.log("RULE 18")
+	const exisitingPasswd = getPasswordText()!
+	let periodicTableSymbols = []
+	let totalAtomicValue = 0
+	for (let i = 0; i < exisitingPasswd.length; i++) {
+		const singleLetterSymbol = exisitingPasswd[i]
+		const doubleLetterSymbol = exisitingPasswd[i] + exisitingPasswd[i + 1]
+		if (periodicTable.includes(doubleLetterSymbol)) {
+			periodicTableSymbols.push(doubleLetterSymbol)
+			totalAtomicValue += periodicTable.indexOf(doubleLetterSymbol)
+		} else if (periodicTable.includes(singleLetterSymbol)) {
+			periodicTableSymbols.push(singleLetterSymbol)
+			totalAtomicValue += periodicTable.indexOf(singleLetterSymbol)
+		}
+	}
+
+	let balance = 200 - totalAtomicValue
+	console.log(balance, periodicTableSymbols,totalAtomicValue)
+	if (balance === 0) return
+	if (balance > 0) {
+		let periodicSymbolsAdded = []
+		while (balance > 117 || containsRomanNumeral(periodicTable[balance])) {
+			periodicSymbolsAdded.push("H")
+			balance -= 1
+		}
+		periodicSymbolsAdded.push(periodicTable[balance])
+		previouslyAddedPeriodicSymbols.push(periodicSymbolsAdded.join(""))
+		appendPassword(getPassword(), periodicSymbolsAdded.join(""))
+	} else {
+		const popped = previouslyAddedPeriodicSymbols.pop()
+		if (!popped) {
+			return
+		}
+		replacePassword(popped, "")
+	}
+}
+
+function rule23() {
+	const feedBugs = "🐛🐛🐛🐛🐛🐛🐛🐛"
+	setInterval(() => {
+		const curr = getPassword()
+		const bugs = curr.match(/🐛/g)?.length || 0
+		if (bugs < 6) {
+			appendPassword(curr, "🐛")
+		}
+	}, 1000)
+	return feedBugs
+}
+
+function rule25() {
+	let clicked = 0
+	let notInPasswd = getSacrificialLetters()
+	if (notInPasswd.length < 2) {
+		window.location.reload()
+		return false
+	}
+	lettersNotToBe = [
+		notInPasswd[0],
+		notInPasswd[1],
+		notInPasswd[0].toLowerCase(),
+		notInPasswd[1].toLowerCase(),
+	]
+	const keyboard = document.querySelector(".letters")!.childNodes
+	keyboard.forEach(async (keys) => {
+		const btn = keys as HTMLButtonElement
+		if (btn.innerText === notInPasswd[0] || btn.innerText === notInPasswd[1]) {
+			btn.click()
+			clicked++
+		}
+	})
+}
+
+async function rule28() {
+	let hexCode = getHexCode()
+	while (
+		containsRomanNumeral(hexCode) ||
+		containsPeriodicSymbol(hexCode) ||
+		contains(hexCode, lettersNotToBe) ||
+		/[0-9]/.test(hexCode)
+	) {
+		const color = document.querySelector(".rand-color")! as HTMLElement
+		const refresh = color.firstChild as HTMLElement
+		refresh.click()
+		await sleep(50)
+		hexCode = getHexCode()
+	}
+	return hexCode
+}
+
+function rule32() {
+	const password = Number(
+		document.querySelector(".password-length.show-password-length")!.textContent
+	)
+	if (password < 211) {
+		appendPassword(getPassword(), "-")
+	} else if (password > 211) {
+		replacePassword("-", "")
+	} else {
+		appendPassword(getPassword(), "211")
+	}
+}
+
+function rule35() {
+	const addTime = (time: string, x: number) => {
+		const curr = time.split(":")
+		const hours = Number(curr[0])
+		const minutes = Number(curr[1])
+		const newMinutes = minutes + x
+		if (newMinutes > 59) {
+			const newHours = hours + 1
+			return `${newHours}:${newMinutes - 60}`
+		}
+		return `${hours}:${newMinutes}`
+	}
+	const currTime = getCurrentTime()
+	return addTime(currTime, 1)
+}
+
+export { rule5, rule10, rule18, rule23, rule25, rule28, rule32, rule35 }

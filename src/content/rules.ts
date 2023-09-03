@@ -42,10 +42,6 @@ function rule5() {
 
 async function rule10() {
 	let captcha = getCaptcha()
-
-	console.log(
-		containsRomanNumeral(captcha) , /[0-9]/.test(captcha) , containsPeriodicSymbol(captcha)
-	)
 	while (
 		containsRomanNumeral(captcha) ||
 		/[0-9]/.test(captcha) ||
@@ -60,7 +56,6 @@ async function rule10() {
 }
 
 function rule18() {
-	console.log("RULE 18")
 	const exisitingPasswd = getPasswordText()!
 	let periodicTableSymbols = []
 	let totalAtomicValue = 0
@@ -77,7 +72,6 @@ function rule18() {
 	}
 
 	let balance = 200 - totalAtomicValue
-	console.log(balance, periodicTableSymbols,totalAtomicValue)
 	if (balance === 0) return
 	if (balance > 0) {
 		let periodicSymbolsAdded = []

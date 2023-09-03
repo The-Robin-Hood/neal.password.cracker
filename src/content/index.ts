@@ -149,7 +149,7 @@ window.onload = async () => {
 			setTimeout(() => {
 				copyPaste()
 				let endTime = new Date().getTime() - startTime
-				console.log("Execution time: " + endTime)
+				console.log("Execution time: " + endTime/1000 + "s")
 			}, 1000)
 		}
 	}, 500)

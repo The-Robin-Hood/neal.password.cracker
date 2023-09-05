@@ -91,18 +91,6 @@ function rule18() {
 	}
 }
 
-function rule23() {
-	const feedBugs = "🐛🐛🐛🐛🐛🐛🐛🐛"
-	setInterval(() => {
-		const curr = getPassword()
-		const bugs = curr.match(/🐛/g)?.length || 0
-		if (bugs < 6) {
-			appendPassword(curr, "🐛")
-		}
-	}, 1000)
-	return feedBugs
-}
-
 function rule25() {
 	let clicked = 0
 	let notInPasswd = getSacrificialLetters()
@@ -137,7 +125,7 @@ async function rule28() {
 		const color = document.querySelector(".rand-color")! as HTMLElement
 		const refresh = color.firstChild as HTMLElement
 		refresh.click()
-		await sleep(50)
+		await sleep(10)
 		hexCode = getHexCode()
 	}
 	return hexCode
@@ -159,17 +147,24 @@ function rule32() {
 function rule35() {
 	const addTime = (time: string, x: number) => {
 		const curr = time.split(":")
-		const hours = Number(curr[0])
-		const minutes = Number(curr[1])
-		const newMinutes = minutes + x
-		if (newMinutes > 59) {
-			const newHours = hours + 1
-			return `${newHours}:${newMinutes - 60}`
+		const minutes = Number(curr[0])
+		const seconds = Number(curr[1])
+		const newSeconds = seconds + x
+		if (newSeconds > 59) {
+			const newMinutes = minutes + 1
+			return `${newMinutes}:${newSeconds - 60}`
 		}
-		return `${hours}:${newMinutes}`
+		if (newSeconds < 10) {
+			return `${minutes}:0${newSeconds}`
+		}
+		return `${minutes}:${newSeconds}`
 	}
 	const currTime = getCurrentTime()
-	return addTime(currTime, 1)
+	if (new Date().getSeconds() > 20) {
+		return addTime(currTime, 1)
+	} else {
+		return currTime
+	}
 }
 
-export { rule5, rule10, rule18, rule23, rule25, rule28, rule32, rule35 }
+export { rule5, rule10, rule18, rule25, rule28, rule32, rule35 }

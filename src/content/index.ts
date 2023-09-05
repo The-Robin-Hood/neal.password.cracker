@@ -1,6 +1,7 @@
-import { appendPassword, getPassword, getPasswordText, replacePassword } from "./utils"
-import { rule10, rule18, rule23, rule25, rule28, rule32, rule35, rule5 } from "./rules"
+import { appendPassword, calcTimer, changeWidth, getPassword, getPasswordText, replacePassword } from "./utils"
+import { rule10, rule18, rule25, rule28, rule32, rule35, rule5 } from "./rules"
 import {
+	autoBugFeeder,
 	copyPaste,
 	getAffirmation,
 	getChessSolution,
@@ -10,25 +11,14 @@ import {
 	getYTLink,
 } from "./helper"
 
-// declare a global variable
-declare global {
-	interface Window {
-		hold: boolean
-		automation: boolean
-	}
-}
+let mainId: number;
+let bugFeederId: number;
+let timerId: number;
+let onProgress: boolean = false;
+let completed: boolean = false;
 
-let passwdBox = document.querySelector(".ProseMirror")
-let passwd = passwdBox!.textContent
-let rulesState: Record<string, boolean> = {}
-
-window.hold = false
-
-window.onload = async () => {
-	// default things to be done at first
-
-	;(document.querySelector(".password-wrapper")! as HTMLElement).style.minWidth =
-		"calc(90% - 100px)"
+async function automate() {
+	let rulesState: Record<string, boolean> = {}
 	const leapyear = "2000@"
 	const romanNumeral = "XXXV"
 	const weightLifters = "🏋️‍♂️🏋️‍♂️🏋️‍♂️"
@@ -38,32 +28,40 @@ window.onload = async () => {
 	const periodicSymbol = "He"
 	const wordle = await getWordle()
 	const getTime = rule35()
-	const bugs = rule23()
+	const bugs = "🐛🐛🐛🐛🐛🐛🐛🐛"
 	const moonEmoji = getMoonPhaseEmoji()
 	const selfWords = getAffirmation()
+
+	if (getPasswordText()?.length! > 1) {
+		window.location.reload()
+	}
+	onProgress = true;
+	changeWidth()
+	timerId = calcTimer();
 	appendPassword(
 		getPassword(),
 		periodicSymbol +
-			getTime +
-			romanNumeral +
-			leapyear +
-			wordle +
-			weightLifters +
-			egg +
-			bugs +
-			month +
-			sponsor +
-			moonEmoji +
-			selfWords
+		getTime +
+		romanNumeral +
+		leapyear +
+		wordle +
+		weightLifters +
+		egg +
+		bugs +
+		month +
+		sponsor +
+		moonEmoji +
+		selfWords
 	)
+
+	bugFeederId = autoBugFeeder();
 
 	let ytLinkAdded = false
 	let colorSelected = false
+	let sacrificeBtnClicked = false
 	let startTime = new Date().getTime()
 
-	const timerrr = setInterval(async () => {
-		if (window.hold) return
-		passwd = passwdBox!.textContent
+	mainId = setInterval(async () => {
 		let currentDisplayedRules = document.querySelectorAll(
 			".rule-icon"
 		) as NodeListOf<HTMLImageElement>
@@ -114,15 +112,15 @@ window.onload = async () => {
 						}
 						break
 					case "25":
+						if (sacrificeBtnClicked) break
+						sacrificeBtnClicked = true
 						rule25()
-						window.hold = true
 						setTimeout(() => {
 							const sacrificeBtn = document.querySelector(".sacrafice-btn") as HTMLButtonElement
 							sacrificeBtn.click()
-							window.hold = false
 						}, 1000)
 						break
-					case "27" || "33":
+					case "27" || "33" || "35":
 						appendPassword(getPassword(), "-")
 						break
 					case "28":
@@ -143,14 +141,46 @@ window.onload = async () => {
 
 		const finalPasswd = document.querySelector(".final-password")
 		if (finalPasswd) {
-			clearInterval(timerrr)
+			clearInterval(mainId)
+			clearInterval(bugFeederId)
 			const btn = finalPasswd.firstChild as HTMLButtonElement
 			btn.click()
 			setTimeout(() => {
 				copyPaste()
+				completed = true;
+				clearInterval(timerId);
 				let endTime = new Date().getTime() - startTime
-				console.log("Execution time: " + endTime/1000 + "s")
+				console.log("Execution time: " + endTime / 1000 + "s")
 			}, 1000)
 		}
 	}, 500)
+	return mainId;
 }
+
+
+chrome.runtime.onMessage.addListener(function (request) {
+	if (request.type === "auto-complete") {
+		if (request.checked && !completed && !onProgress) {
+			automate()
+		}
+		else {
+			if (mainId) {
+				onProgress = false;
+				clearInterval(mainId)
+			}
+			if (bugFeederId) {
+				clearInterval(bugFeederId);
+			}
+			if (timerId) {
+				clearInterval(timerId);
+			}
+		}
+	}
+})
+
+
+chrome.storage.local.get(["auto-complete"], (result) => {
+	if (result["auto-complete"] && !onProgress && !completed) {
+		automate()
+	}
+})

@@ -6,7 +6,8 @@
     "permissions": [
         "activeTab",
         "scripting",
-        "webRequest"
+        "webRequest",
+        "storage"
     ],
     "host_permissions": [
         "https://*.neal.fun/*"

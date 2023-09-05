@@ -134,7 +134,14 @@ function replacePassword(replace: string, replaceWith: string) {
 			"" +
 			passwdBox!.textContent!.slice(lastIndex + 1)
 		appendPassword(passwd, newPasswd, true)
-	} else {
+	} else if (/[0-9]/.test(replace)) {
+		previousPassword = passwd
+		const textList = passwdBox!.textContent!.split("-----")
+		textList[1] = textList[1].replace(replace, replaceWith)
+		const newPasswd = textList.join("-----")
+		appendPassword(passwd, newPasswd, true)
+	 }
+	else {
 		previousPassword = passwd
 		const newPasswd = passwdBox!.textContent!.replace(replace, replaceWith)
 		appendPassword(passwd, newPasswd, true)
@@ -164,6 +171,46 @@ function subtractAndSplit(arr: any[], target: number) {
 	}
 }
 
+function changeWidth() {
+	const container = document.querySelector(".password-wrapper")! as HTMLElement
+	container.style.minWidth = "calc(90% - 100px)"
+}
+
+
+function calcTimer() {
+	const timerDiv = document.createElement('div');
+	timerDiv.style.display = "flex";
+	timerDiv.style.alignItems = "center";
+	timerDiv.style.fontWeight = "bold";
+	timerDiv.style.width = "100%";
+	timerDiv.style.fontSize = "40px"
+	timerDiv.style.marginBottom = "10px"
+	timerDiv.style.justifyContent = "center"
+
+	document.querySelector(".password-label")!.insertAdjacentElement("afterend", timerDiv)
+	let startTime:number;
+	let timerInterval;
+
+	function updateTimer() {
+		const currentTime = new Date().getTime();
+		const elapsedTime = new Date(currentTime - startTime);
+
+		const minutes = elapsedTime.getUTCMinutes();
+		const seconds = elapsedTime.getUTCSeconds();
+		const milliseconds = elapsedTime.getUTCMilliseconds();
+
+		timerDiv.textContent = `${minutes > 0 ? minutes + ':' : ''}${seconds < 10 ? '0' : ''
+			}${seconds}:${milliseconds < 10 ? '00' : milliseconds < 100 ? '0' : ''}${milliseconds}`;
+	}
+
+	startTime = new Date().getTime();
+	timerInterval = setInterval(updateTimer, 10); // Update every 10 milliseconds (adjust as needed)
+	return timerInterval;
+}
+
+
+
+
 export {
 	getPassword,
 	getPasswordText,
@@ -174,5 +221,7 @@ export {
 	contains,
 	containsPeriodicSymbol,
 	containsRomanNumeral,
+	changeWidth,
 	sleep,
+	calcTimer
 }

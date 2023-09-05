@@ -1,9 +1,11 @@
 import { DateTime } from "luxon"
 import { chessSolution, geoLocations, periodicTable, youtubeLinks } from "./constants"
 import {
+	appendPassword,
 	containsPeriodicSymbol,
 	containsRomanNumeral,
 	convertTimeFormat,
+	getPassword,
 	getPasswordText,
 } from "./utils"
 import suncalc from "suncalc"
@@ -195,6 +197,18 @@ export const getAffirmation = () => {
 	const affirmations = ["iamloved", "iamworthy", "iamenough"]
 	const randomIndex = Math.floor(Math.random() * affirmations.length)
 	return affirmations[randomIndex]
+}
+
+// Rule 23
+export const autoBugFeeder = () => {
+	const feederId = setInterval(() => {
+		const curr = getPassword()
+		const bugs = curr.match(/🐛/g)?.length || 0
+		if (bugs < 6) {
+			appendPassword(curr, "🐛")
+		}
+	}, 1000)
+	return feederId;
 }
 
 // Rule - 24

@@ -186,17 +186,17 @@ function isTimeGreaterThan10(time: string) {
 }
 function addTime(time: string, x: number) {
 	const curr = time.split(":")
-	const minutes = Number(curr[0])
-	const seconds = Number(curr[1])
-	const newSeconds = seconds + x
-	if (newSeconds > 59) {
-		const newMinutes = minutes + 1
-		return `${newMinutes}:${newSeconds - 60}`
+	const hours = Number(curr[0])
+	const minutes = Number(curr[1])
+	const newMins = minutes + x
+	if (newMins > 59) {
+		const newhours = hours + 1
+		return `${newhours}:00`
 	}
-	if (newSeconds < 10) {
-		return `${minutes}:0${newSeconds}`
+	if (newMins < 10) {
+		return `${hours}:0${newMins}`
 	}
-	return `${minutes}:${newSeconds}`
+	return `${hours}:${newMins}`
 }
 
 function nextTimeToSolve() {

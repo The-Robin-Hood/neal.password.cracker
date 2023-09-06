@@ -10,7 +10,7 @@ const publicDir = resolve(rootDir, "public");
 
 export default defineConfig({
   build: {
-    outDir: "chrome_ext",
+    outDir: "build",
     rollupOptions: {
       input: {
         content: resolve(srcDir, "content", "index.ts"),

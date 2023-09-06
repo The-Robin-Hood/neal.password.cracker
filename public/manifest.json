@@ -3,16 +3,17 @@
 	"name": "Neal Password Cracker",
 	"version": "1.0",
 	"description": "Extension that helps you crack the password in neal.fun password game",
+	"icons": {
+		"16": "assets/16x16.png",
+		"48": "assets/48x48.png",
+		"128": "assets/128x128.png"
+	},
+	"author": "ansari_official@yahoo.com",
 	"permissions": ["activeTab", "scripting", "webRequest", "storage"],
 	"host_permissions": ["https://*.neal.fun/*"],
 	"action": {
 		"default_popup": "src/popup/index.html",
 		"default_title": "Neal Password Cracker"
-	},
-	"icons": {
-		"16": "assets/16x16.png",
-		"48": "assets/48x48.png",
-		"128": "assets/128x128.png"
 	},
 	"background": {
 		"service_worker": "src/background/index.js",

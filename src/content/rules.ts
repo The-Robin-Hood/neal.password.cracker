@@ -93,7 +93,6 @@ function rule18() {
 }
 
 function rule25() {
-	let clicked = 0
 	let notInPasswd = getSacrificialLetters()
 	if (notInPasswd.length < 2) {
 		window.location.reload()
@@ -110,7 +109,6 @@ function rule25() {
 		const btn = keys as HTMLButtonElement
 		if (btn.innerText === notInPasswd[0] || btn.innerText === notInPasswd[1]) {
 			btn.click()
-			clicked++
 		}
 	})
 }

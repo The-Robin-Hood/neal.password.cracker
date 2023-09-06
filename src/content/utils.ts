@@ -1,4 +1,5 @@
 import { periodicTable, fonts } from "./constants"
+import { getCurrentTime } from "./helper"
 
 let previousPassword = ""
 let entirePassword: Record<string, string[]> = {}
@@ -140,8 +141,7 @@ function replacePassword(replace: string, replaceWith: string) {
 		textList[1] = textList[1].replace(replace, replaceWith)
 		const newPasswd = textList.join("-----")
 		appendPassword(passwd, newPasswd, true)
-	 }
-	else {
+	} else {
 		previousPassword = passwd
 		const newPasswd = passwdBox!.textContent!.replace(replace, replaceWith)
 		appendPassword(passwd, newPasswd, true)
@@ -176,40 +176,75 @@ function changeWidth() {
 	container.style.minWidth = "calc(90% - 100px)"
 }
 
+function isTimeGreaterThan10(time: string) {
+	let sum = 0
+	time = time.replaceAll(":", "")
+	time.split("").forEach((t) => {
+		sum += Number(t)
+	})
+	return sum > 10
+}
+function addTime(time: string, x: number) {
+	const curr = time.split(":")
+	const minutes = Number(curr[0])
+	const seconds = Number(curr[1])
+	const newSeconds = seconds + x
+	if (newSeconds > 59) {
+		const newMinutes = minutes + 1
+		return `${newMinutes}:${newSeconds - 60}`
+	}
+	if (newSeconds < 10) {
+		return `${minutes}:0${newSeconds}`
+	}
+	return `${minutes}:${newSeconds}`
+}
+
+function nextTimeToSolve() {
+	let currTime = getCurrentTime()
+	while (isTimeGreaterThan10(currTime)) {
+		currTime = addTime(currTime, 1)
+	}
+	return currTime
+}
 
 function calcTimer() {
-	const timerDiv = document.createElement('div');
-	timerDiv.style.display = "flex";
-	timerDiv.style.alignItems = "center";
-	timerDiv.style.fontWeight = "bold";
-	timerDiv.style.width = "100%";
+	const timerDiv = document.createElement("div")
+	timerDiv.style.display = "flex"
+	timerDiv.style.alignItems = "end"
+	timerDiv.style.fontWeight = "bold"
+	timerDiv.style.width = "100%"
 	timerDiv.style.fontSize = "40px"
 	timerDiv.style.marginBottom = "10px"
 	timerDiv.style.justifyContent = "center"
+	timerDiv.style.gap = "10px"
 
 	document.querySelector(".password-label")!.insertAdjacentElement("afterend", timerDiv)
-	let startTime:number;
-	let timerInterval;
+	let startTime: number
+	let timerInterval
 
 	function updateTimer() {
-		const currentTime = new Date().getTime();
-		const elapsedTime = new Date(currentTime - startTime);
+		const currentTime = new Date().getTime()
+		const elapsedTime = new Date(currentTime - startTime)
 
-		const minutes = elapsedTime.getUTCMinutes();
-		const seconds = elapsedTime.getUTCSeconds();
-		const milliseconds = elapsedTime.getUTCMilliseconds();
+		const minutes = elapsedTime.getUTCMinutes()
+		const seconds = elapsedTime.getUTCSeconds()
+		const milliseconds = elapsedTime.getUTCMilliseconds()
+		let formattedMinutes = ``
+		if (minutes > 1) {
+			formattedMinutes = `${minutes}m`
+		}
+		const formattedSeconds = `${seconds}s`
+		const formattedMilliseconds = `${Math.floor(milliseconds / 10)
+			.toString()
+			.padStart(2, "0")}`
 
-		timerDiv.textContent = `${minutes > 0 ? minutes + ':' : ''}${seconds < 10 ? '0' : ''
-			}${seconds}:${milliseconds < 10 ? '00' : milliseconds < 100 ? '0' : ''}${milliseconds}`;
+		timerDiv.innerHTML = `<span style="letter-spacing: 3px;">${formattedMinutes} ${formattedSeconds} </span> <span style="font-size:30px;">${formattedMilliseconds}</span>`
 	}
 
-	startTime = new Date().getTime();
-	timerInterval = setInterval(updateTimer, 10); // Update every 10 milliseconds (adjust as needed)
-	return timerInterval;
+	startTime = new Date().getTime()
+	timerInterval = setInterval(updateTimer, 10) // Update every 10 milliseconds (adjust as needed)
+	return timerInterval
 }
-
-
-
 
 export {
 	getPassword,
@@ -223,5 +258,8 @@ export {
 	containsRomanNumeral,
 	changeWidth,
 	sleep,
-	calcTimer
+	calcTimer,
+	addTime,
+	nextTimeToSolve,
+	isTimeGreaterThan10,
 }

@@ -1,6 +1,7 @@
 import { periodicTable } from "./constants"
 import { getCaptcha, getCurrentTime, getHexCode, getSacrificialLetters } from "./helper"
 import {
+	addTime,
 	appendPassword,
 	contains,
 	containsPeriodicSymbol,
@@ -145,20 +146,6 @@ function rule32() {
 }
 
 function rule35() {
-	const addTime = (time: string, x: number) => {
-		const curr = time.split(":")
-		const minutes = Number(curr[0])
-		const seconds = Number(curr[1])
-		const newSeconds = seconds + x
-		if (newSeconds > 59) {
-			const newMinutes = minutes + 1
-			return `${newMinutes}:${newSeconds - 60}`
-		}
-		if (newSeconds < 10) {
-			return `${minutes}:0${newSeconds}`
-		}
-		return `${minutes}:${newSeconds}`
-	}
 	const currTime = getCurrentTime()
 	if (new Date().getSeconds() > 20) {
 		return addTime(currTime, 1)

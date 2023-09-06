@@ -2,7 +2,6 @@ import { DateTime } from "luxon"
 import { chessSolution, geoLocations, periodicTable, youtubeLinks } from "./constants"
 import {
 	appendPassword,
-	containsPeriodicSymbol,
 	containsRomanNumeral,
 	convertTimeFormat,
 	getPassword,
@@ -186,9 +185,6 @@ export const getChessSolution = () => {
 	const url = element.src
 	const index = url.split("chess/puzzle")[1].replace(".svg", "")
 	const solution = chessSolution[parseInt(index)]
-	if (containsPeriodicSymbol(solution)) {
-		window.location.reload()
-	}
 	return solution
 }
 
